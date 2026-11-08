@@ -1,0 +1,35 @@
+# ── Vídeos (NUNCA versionar: penalidade de −10%) ──────────────────
+videos/
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+
+# ── Pesos de modelos ──────────────────────────────────────────────
+*.pt
+*.pth
+*.onnx
+*.engine
+
+# ── Ambiente / caches ─────────────────────────────────────────────
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+.idea/
+runs/
+
+# ── Intermediários (regeneráveis pelos scripts; não fazem parte da avaliação)
+saidas/**/*.npy
+saidas/**/*.npz
+saidas/**/*.log
+saidas/**/figuras/
+saidas/**/*.jpg
+
+# ── Material de apoio da disciplina (está em github.com/eron93br/vc-20262-p3)
+README_apoio.md
+ROTEIRO.md
+CONCEITOS.md

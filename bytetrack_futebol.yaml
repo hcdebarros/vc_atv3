@@ -1,0 +1,13 @@
+# ByteTrack ajustado para futebol (câmera tática, 25 fps).
+# Diferenças em relação ao padrão do Ultralytics (bytetrack.yaml):
+#  - track_buffer 75 (3 s): jogadores ocluídos em disputas voltam com o MESMO id;
+#  - new_track_thresh 0.40: menos tracks espúrios (torcida, sombras) → menos IDs novos;
+#  - track_low_thresh 0.10: a 2ª etapa do ByteTrack recupera caixas fracas (oclusão parcial).
+#    Para isso, o detector deve ser chamado com conf baixo (--conf 0.10), senão a 2ª etapa não recebe nada.
+tracker_type: bytetrack
+track_high_thresh: 0.30
+track_low_thresh: 0.10
+new_track_thresh: 0.40
+track_buffer: 75
+match_thresh: 0.80
+fuse_score: True

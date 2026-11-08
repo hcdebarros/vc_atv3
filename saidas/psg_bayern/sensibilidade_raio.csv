@@ -1,0 +1,4 @@
+raio_m,quadros_com_dono_pct,posse_time0_pct,posse_time1_pct,passes,passes_certos,precisao_passe_pct,validacao_precisao,validacao_revocacao,validacao_f1
+1.0,25.4,52.5,47.5,38,28,73.7,0.55,0.46,0.5
+2.0,54.8,58.9,41.1,68,37,54.4,0.37,0.54,0.44
+3.0,69.2,55.5,44.5,80,45,56.2,0.29,0.5,0.37

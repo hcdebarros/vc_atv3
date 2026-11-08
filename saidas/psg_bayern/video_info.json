@@ -1,0 +1,10 @@
+{
+  "fps": 25.0,
+  "n_frames": 4500,
+  "duracao_s": 180.0,
+  "largura": 1920,
+  "altura": 1080,
+  "cortes": [],
+  "limiar_corte": 0.6,
+  "video_nome": "Psg Bayern - camara tactica_clip.mp4"
+}

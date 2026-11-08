@@ -1,0 +1,98 @@
+{
+  "video": "videos/Psg Bayern - camara tactica_clip.mp4",
+  "modelo": "yolov8m.pt",
+  "device": "cuda",
+  "fps": 25.0,
+  "largura": 1920,
+  "altura": 1080,
+  "n_frames": 4500,
+  "inicio_s": 0.0,
+  "imgsz": 1280,
+  "conf": 0.1,
+  "conf_bola": 0.1,
+  "tracker": "bytetrack_futebol.yaml",
+  "k": 3,
+  "filtro_gramado": true,
+  "fps_processamento": 13.224038115887955,
+  "times_bgr": {
+    "0": [
+      70,
+      98,
+      88
+    ],
+    "1": [
+      74,
+      111,
+      138
+    ],
+    "-2": [
+      82,
+      113,
+      92
+    ]
+  },
+  "times_bgr_online": {
+    "0": [
+      97,
+      90,
+      82
+    ],
+    "1": [
+      87,
+      112,
+      154
+    ],
+    "-2": [
+      19,
+      36,
+      20
+    ]
+  },
+  "classificacao_times": {
+    "metodo": "pós-processamento por track: descritor de cor (frações de matiz/branco/escuro) médio do track + K-Means k=2 + outliers",
+    "passo": 2,
+    "min_amostras": 8,
+    "outlier": 2.5,
+    "regra_arbitro": {
+      "verde_ciano_min": 0.08,
+      "escuro_max": 0.15,
+      "tracks": [
+        8,
+        44,
+        213,
+        312,
+        592,
+        692,
+        895,
+        987,
+        1039,
+        1114,
+        1283,
+        1670,
+        1785,
+        1901
+      ]
+    },
+    "k": 2,
+    "centroides": {
+      "0": {
+        "vermelho": 0.031,
+        "laranja_amarelo": 0.051,
+        "verde_ciano": 0.018,
+        "azul": 0.232,
+        "roxo_rosa": 0.004,
+        "branco": 0.097,
+        "escuro": 0.319
+      },
+      "1": {
+        "vermelho": 0.453,
+        "laranja_amarelo": 0.434,
+        "verde_ciano": 0.0,
+        "azul": 0.011,
+        "roxo_rosa": 0.001,
+        "branco": 0.024,
+        "escuro": 0.027
+      }
+    }
+  }
+}

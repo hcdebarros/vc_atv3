@@ -1,0 +1,14 @@
+{
+  "quadros": 4500,
+  "quadros_com_deteccao_yolo": 2794,
+  "pct_quadros_com_deteccao_yolo": 62.1,
+  "quadros_com_deteccao_no_campo": 1450,
+  "candidatas": 4363,
+  "candidatas_fora_do_campo": 2744,
+  "aceitas_apos_gating": 1077,
+  "preenchidas_kalman": 2355,
+  "quadros_rejeitados_gating": 373,
+  "cobertura_final_pct": 76.3,
+  "max_lacuna": 15,
+  "gate": 6.0
+}

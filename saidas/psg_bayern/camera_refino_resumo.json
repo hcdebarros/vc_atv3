@@ -1,0 +1,6 @@
+{
+  "metodo": "pares consecutivos ORB + ICP de linhas do campo",
+  "quadros_refinados_pct": 100.0,
+  "inliers_medianos": 440,
+  "usar_ancoras": true
+}

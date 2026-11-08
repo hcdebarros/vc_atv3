@@ -1,0 +1,6 @@
+{
+  "rotulos": "anotação manual (passes detectados casados com passes_anotados.csv)",
+  "passes_detectados": 68,
+  "passes_casados": 25,
+  "tolerancia_s": 1.0
+}

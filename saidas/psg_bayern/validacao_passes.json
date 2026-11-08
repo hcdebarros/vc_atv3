@@ -1,0 +1,14 @@
+{
+  "tolerancia_s": 1.0,
+  "detectados": 68,
+  "anotados": 46,
+  "casados": 25,
+  "falsos_positivos": 43,
+  "falsos_negativos": 21,
+  "precisao": 0.368,
+  "revocacao": 0.543,
+  "f1": 0.439,
+  "acordo_sucesso": 0.76,
+  "anotados_certos_pct": 91.3,
+  "detectados_certos_pct": 54.4
+}

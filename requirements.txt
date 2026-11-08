@@ -1,0 +1,28 @@
+# Versões fixadas — ambiente usado pelo grupo (Windows 11, Python 3.12, RTX 5060 Ti).
+#
+# PyTorch com CUDA 12.8 (obrigatório para GPUs RTX 50 / Blackwell) vem de um índice próprio:
+#   pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
+# Depois:
+#   pip install -r requirements.txt
+# (Sem GPU NVIDIA, instale torch/torchvision CPU normalmente; tudo roda, só que mais devagar.)
+
+# ── Detecção + rastreamento ────────────────────────────────────────
+ultralytics==8.4.207        # YOLOv8/YOLO11 + ByteTrack embutido
+lap==0.5.14                 # associação linear usada pelo ByteTrack
+torch==2.11.0               # +cu128 (ver acima)
+torchvision==0.26.0         # +cu128 (ver acima)
+opencv-python==5.0.0.93     # vídeo, desenho, homografia, ORB
+
+# ── Análise ────────────────────────────────────────────────────────
+numpy==2.5.4
+pandas==3.1.1
+scikit-learn==1.9.1         # K-Means (times) e regressão logística (eXP)
+matplotlib==3.11.2          # campo, mapas de calor, superfícies de eXP
+tqdm==4.70.1
+
+# ── Slides (esqueleto .pptx) ───────────────────────────────────────
+python-pptx==1.0.2
+
+# ── Opcional: só para baixar o trecho (o vídeo do grupo já foi obtido fora do repo)
+# yt-dlp==2026.10.26
+# imageio-ffmpeg==0.8.1     # ffmpeg embutido, caso não haja ffmpeg no PATH
