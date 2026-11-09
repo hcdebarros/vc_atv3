@@ -370,7 +370,12 @@ What-if (destino deslocado 3–6 m, 2 passes errados): ganho médio de eXP **0.2
 ![superfície de eXP (modelo logístico, rótulos do detector)](figuras/superficie_xp_rotulos_detector.png)
 ![calibração do eXP (rótulos do detector)](figuras/calibracao_xp_rotulos_detector.png)
 
-> **Atenção (vazamento de rótulo na versão B):** com rótulos do detector, "passe errado" significa "quem tocou depois é adversário", e a feature `espaco_destino` mede justamente a distância do adversário mais próximo ao ponto onde a bola chegou. O logístico dá peso alto a ela e "lê parte da resposta" — a AUC da versão B está otimista. `<!-- ESCREVER: discutir -->`
+> **Atenção (vazamento de rótulo na versão B):** com rótulos do detector, "passe errado" significa "quem tocou depois é adversário", e a feature `espaco_destino` mede justamente a distância do adversário mais próximo ao ponto onde a bola chegou. O logístico dá peso alto a ela e "lê parte da resposta" — a AUC da versão B está otimista. 
+
+Discussão: vazamento de rótulo na versão B
+Na versão B, identificamos um vazamento de rótulo: o rótulo “passe errado” significa que o próximo dono da bola é um adversário, e a feature espaco_destino mede justamente a distância do adversário mais próximo ao ponto onde a bola chegou, ou seja, uma informação muito próxima do próprio resultado que o modelo tenta prever. Isso fica evidente nos pesos da regressão logística (features padronizadas): 1,07 para espaco_destino e apenas 0,08 para a distância. O sinal positivo da distância também é pouco coerente, pois sugere que passes mais longos seriam mais seguros.
+Por isso, a AUC de 0,79 (contra 0,64 do baseline) provavelmente está inflada. Além disso, 23 dos 43 falsos positivos foram marcados pelo detector como passes errados, possivelmente disputas de bola.
+A versão A, baseada em rótulos manuais, não apresenta esse problema, mas possui apenas 2 passes errados em 25 observações, uma amostra pequena demais para conclusões confiáveis. Como próximos passos, seria necessário medir o espaço no destino antes do passe e ampliar as anotações manuais.
 
 **Q6.1 — Features × 17 canais de Gomes et al.**
 | nossa feature | canal(is) análogo(s) na Tabela 1 |
@@ -401,16 +406,18 @@ No PAx, o ID #16 (PSG) aparece no topo (+1,03), mas com **2 passes** — e um "j
 ## 10. Análise crítica
 
 ### Como essas métricas poderiam ser usadas em estatísticas reais de futebol
-<!-- ESCREVER: avaliação de jogadores (PAx, distância), tática (mapas de calor, posse por zona), scouting com vídeo de transmissão quando não há dados de tracking, etc. -->
+As métricas do pipeline se parecem com as estatísticas que clubes e emissoras já usam, mas são extraídas do vídeo de transmissão, sem equipamentos caros de rastreamento. Na tática, a posse e os mapas de calor mostram como cada time ocupa o campo. No aspecto físico, a distância percorrida e a velocidade máxima acompanham o desempenho dos atletas. Na avaliação de jogadores, o eXP e o PAx comparam os passes certos com o esperado, e o what-if simula como o posicionamento do receptor mudaria a chance de acerto. Isso seria útil principalmente no scouting e na análise de desempenho. Para resultados confiáveis, porém, ainda seria preciso testar jogos completos, melhorar a identificação dos jogadores e a homografia e ampliar a validação manual.
 
 ### Limitações
-<!-- ESCREVER: trocas de ID, oclusões, bola pequena/no ar, câmera única com pan (jogadores fora do quadro), erro de homografia, comissão técnica no gramado, amostra pequena, rótulos de passe derivados do próprio detector. -->
+O rastreamento se fragmenta: o ByteTrack gerou 365 IDs em 3 min, com duração mediana de 2 s, então um “jogador” nas métricas é um ID, não uma pessoa. A bola mede cerca de 13 px, some em oclusões e quando sobe, e só aparece em 74% dos quadros. Como a câmera é única e faz pan, parte dos jogadores fica fora do quadro, e a homografia tem erro de até 2,2 m nas âncoras, o que infla a distância percorrida. A comissão técnica e os gandulas no gramado também são confundidos com jogadores. As métricas dependem de parâmetros: a posse do PSG varia de 52,5% a 58,9% conforme o raio. Por fim, a amostra é pequena (46 passes anotados, só 2 errados entre os casados), o detector de passes tem F1 de 0,44, e os rótulos da versão B do eXP vêm do próprio detector, com vazamento de rótulo.
 
 ### Comparação com os artigos
-<!-- ESCREVER: Ahmad Yousef et al. (Kalman na bola, posse por proximidade) e Gomes et al. (eXP/SoccerMap); o que a nossa validação manual sustenta e o que não sustenta. -->
+Yousef et al. (2025) mostram que a detecção da bola é um dos maiores desafios, com o F1 aumentando de 0,31 para 0,96 com o uso do filtro de Kalman. Nosso trabalho confirma essa dificuldade, mas utiliza o filtro de outra forma: para suavizar a trajetória e preencher falhas na detecção. Com isso, a cobertura passou de 62% para 76% dos quadros. Porém, como não houve anotação manual da posição da bola, não foi possível calcular um F1 comparável.
+Na identificação da posse, utilizamos o mesmo princípio do artigo, considerando o jogador mais próximo da bola. Entretanto, nossa validação mostrou dificuldades em distinguir passes de disputas de bola, com F1 de 0,44.
+Já Gomes et al. (2026) obtiveram AUC de 0,622 com o SoccerMap, contra 0,588 do baseline. Nossos resultados de eXP não permitem uma comparação direta, devido à pequena amostra e aos problemas nos rótulos. Assim, conseguimos reproduzir métodos dos dois artigos, mas ainda precisamos de uma validação maior para avaliar sua eficácia.
 
 ### Próximos passos
-<!-- ESCREVER -->
+Para reduzir a fragmentação dos IDs, usaríamos um modelo de re-identificação por aparência, que reconhece o jogador quando ele volta ao quadro. Para a bola, treinaríamos o YOLO em um dataset específico de futebol, em vez do modelo COCO, e anotaríamos a posição dela em alguns quadros para medir um F1 comparável ao de Ahmad Yousef et al. Na posse e nos passes, exigiríamos que a bola percorresse uma distância mínima antes de contar um passe, para separá-lo de disputas. No eXP, mediríamos o espaço no destino no quadro de saída do passe, eliminando o vazamento de rótulo, e juntaríamos mais trechos com anotação manual até ter passes errados suficientes para treinar e validar os modelos.
 
 ---
 
@@ -423,7 +430,7 @@ No PAx, o ID #16 (PSG) aparece no topo (+1,03), mas com **2 passes** — e um "j
 | `gerar_readme_numeros.py`, `gerar_clipe.py`, `slides/` | README, clipe e slides |
 | `saidas/psg_bayern/` | CSV/JSON gerados (`tracks.csv`, `meta.json`, `bola.csv`, `calibracao.json`, `tracks_campo.csv`, `passes.csv`, `passes_anotados.csv`, `metricas_times.json`, `metricas_jogadores.csv`, `resultados_xp.csv`, …) |
 | `figuras/` | figuras usadas neste README |
-| `RESPOSTAS_Q1-Q6_rascunho_IA.md`, `prompt_claude_code_p3_futebol_yolo.md` | rascunho gerado por IA e prompt usado (ver Declaração de Uso de IA) |
+| `prompt_claude_code_p3_futebol_yolo.md` | prompt usado com a IA (ver Declaração de Uso de IA) |
 
 ## 12. Referências
 
@@ -455,8 +462,8 @@ Conforme a *Política de Uso — Assistentes de IA e LLMs* (Visão Computacional
 | Utilizou IA? | ☒ Sim ☐ Não |
 | Modelo(s) usado(s) | Claude Opus 5.5 (`claude-opus-5-5`), via Claude Code (extensão do VS Code) |
 | Prompt(s) utilizado(s) | Prompt principal: [`prompt_claude_code_p3_futebol_yolo.md`](prompt_claude_code_p3_futebol_yolo.md) (texto exato enviado ao modelo, junto com os PDFs do enunciado e dos dois artigos). Prompts complementares enviados na mesma sessão (texto exato): (1) antes do prompt principal, para obter o trecho: "quero utilizar o script do arquivo "baixar_video.py", ams quero baixar o video em 1080p. e quero do minuto 18:20 até o 21:20 Link do video https://www.youtube.com/watch?v=fg3DmFxMWZ4"; (2) "utilize o prompt contido em: "prompt_claude_code_p3_futebol_yolo.md" para executar o projeto" (com os 3 PDFs anexados); (3) "1) pode utilizar o modelo yolo que for melhor. segue em anexo a declaração de IA 2) Integrantes: Helder Cordeiro de Barros Filho, Lucas Rafael Gomes Maia da Silva, José Kevin Sales da Silva, Lucas Jerônimo Mendes e Felipe Salustiano Moreira. quem apresenta é: Lucas Rafael" (com o PDF da política de IA); (4) "oq eu devo fazer agr?"; (5) saída do terminal de `clicar_marcos.py` colada; (6) saída do terminal de `calibrar_ancoras.py` com um erro, colada; (7) "não tem como não ser na mesma linha"; (8) "terminei" (duas vezes, após as âncoras e após anotar os passes); (9) "oq são essas 33 seções? você não pode fazer?" |
-| Resposta gerada (incorporada à entrega) | Código: `extrair_frame0.py`, `comparar_yolo.py`, `sensibilidade_posse.py`, `gerar_readme_numeros.py`, `gerar_clipe.py`, `ferramentas/*.py`, `bytetrack_futebol.yaml`, `slides/gerar_slides.py`; ajustes nos scripts de apoio da disciplina (filtro de gramado, rastreador, resumos em JSON, filtro de tracks fora do campo); esqueleto deste README e dos slides; **rascunho das respostas Q1–Q6** em [`RESPOSTAS_Q1-Q6_rascunho_IA.md`](RESPOSTAS_Q1-Q6_rascunho_IA.md) (pedido do grupo: "eu quero que você responda as questões Q1,Q2,Q3,Q4,Q5 e Q6"), usado como base para as respostas da Seção 4–9. |
-| Adaptações realizadas | `<!-- ESCREVER: como o grupo validou/corrigiu (ex.: conferência do rastreado.mp4, clique dos marcos, anotação manual dos passes, revisão dos parâmetros, análise crítica escrita pelo grupo) -->` |
+| Resposta gerada (incorporada à entrega) | Código: `extrair_frame0.py`, `comparar_yolo.py`, `sensibilidade_posse.py`, `gerar_readme_numeros.py`, `gerar_clipe.py`, `ferramentas/*.py`, `bytetrack_futebol.yaml`, `slides/gerar_slides.py`; ajustes nos scripts de apoio da disciplina (filtro de gramado, rastreador, resumos em JSON, filtro de tracks fora do campo); esqueleto deste README e dos slides; |
+| Adaptações realizadas | (1) **Calibração manual da câmera:** o grupo clicou os marcos do campo no quadro 0 (`clicar_marcos.py`) e as 10 âncoras de validação a cada 20 s (`calibrar_ancoras.py`), que servem de referência para medir o erro da homografia. (2) **Validação manual dos passes:** o grupo assistiu ao trecho original e anotou 46 passes (`passes_anotados.csv`), com instante, time e certo/errado; essa anotação é usada para medir precisão, revocação e F1 do detector e como rótulo da versão A do eXP. (3) **Análise crítica e discussão do eXP:** os textos das seções 9 (vazamento de rótulo) e 10 partiram de rascunhos sugeridos pela IA (Claude), que o grupo reescreveu com as próprias palavras, corrigindo imprecisões e conferindo os números contra os arquivos de `saidas/`. |
 
 **Seção B — Uso de skill (Claude Code / SKILL.md):** ☐ Sim ☒ Não — nenhuma skill (SKILL.md) foi acionada na sessão.
 
